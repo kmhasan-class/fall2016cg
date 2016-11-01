@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1477969117 source:/home/kmhasan/TestGLFW/main.cpp
+	<iostream>
+	<GLFW/glfw3.h>
+
