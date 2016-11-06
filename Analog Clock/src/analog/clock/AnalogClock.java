@@ -5,6 +5,8 @@
  */
 package analog.clock;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -16,15 +18,29 @@ public class AnalogClock {
     private float angle = 0.0f;
     private final float secondsHandLength = 0.8f;
     private float secondsHandAngle = 90;
+    private final float minutesHandLength = 0.7f;
+    private float minutesHandAngle = 90;
+    private final float hoursHandLength = 0.5f;
+    private float hoursHandAngle = 90;
     
     private void init() {
         GLFW.glfwInit();
         window = GLFW.glfwCreateWindow(600, 600, "Analog Clock", 0, 0);
         GLFW.glfwMakeContextCurrent(window);
         GL.createCapabilities();
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+        GLFW.glfwSwapBuffers(window);
+        
+        LocalTime localTime = LocalTime.now();
+        String tokens[] = localTime.toString().split("\\:");
+        System.out.println(tokens[0] + ":" + tokens[1] + ":" + tokens[2]);
+        double seconds = Double.parseDouble(tokens[2]);
+        secondsHandAngle = (float) (-6 * seconds + 90);
+        // FIX YOUR CODE TO WORK FOR THE MINUTES AND HOUR HAND
     }
     
     private void drawDial() {
+        GL11.glColor3f(1.0f, 1.0f, 0.0f);
         int n = 12;
         double r = 1;
         double theta = 2 * Math.PI / n;
@@ -45,12 +61,37 @@ public class AnalogClock {
     }
     
     private void drawSecondsHand() {
+        GL11.glColor3f(1.0f, 0.0f, 0.0f);
         secondsHandAngle -= 6;
         GL11.glPushMatrix();
         GL11.glRotatef(secondsHandAngle, 0, 0, 1);
         GL11.glBegin(GL11.GL_LINES);
         GL11.glVertex3f(0, 0, 0);
         GL11.glVertex3f(secondsHandLength, 0, 0);
+        GL11.glEnd();
+        GL11.glPopMatrix();
+    }
+
+    private void drawMinutesHand() {
+        GL11.glColor3f(0.0f, 1.0f, 0.0f);
+        minutesHandAngle -= 6/60.0;
+        GL11.glPushMatrix();
+        GL11.glRotatef(minutesHandAngle, 0, 0, 1);
+        GL11.glBegin(GL11.GL_LINES);
+        GL11.glVertex3f(0, 0, 0);
+        GL11.glVertex3f(minutesHandLength, 0, 0);
+        GL11.glEnd();
+        GL11.glPopMatrix();
+    }
+
+    private void drawHoursHand() {
+        GL11.glColor3f(0.0f, 0.0f, 1.0f);
+        hoursHandAngle -= 6/60.0/60.0;
+        GL11.glPushMatrix();
+        GL11.glRotatef(hoursHandAngle, 0, 0, 1);
+        GL11.glBegin(GL11.GL_LINES);
+        GL11.glVertex3f(0, 0, 0);
+        GL11.glVertex3f(hoursHandLength, 0, 0);
         GL11.glEnd();
         GL11.glPopMatrix();
     }
@@ -61,6 +102,8 @@ public class AnalogClock {
                 GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
                 drawDial();
                 drawSecondsHand();
+                drawMinutesHand();
+                drawHoursHand();
                 Thread.sleep(1000);
                 GLFW.glfwSwapBuffers(window);
             }
