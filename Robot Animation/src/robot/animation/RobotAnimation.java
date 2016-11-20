@@ -18,6 +18,7 @@ public class RobotAnimation {
 
     private long window;
     private float neckTiltAngle = 0f;
+    private float armTiltAngle = 0f;
     
     private float neckWidth;
     private float neckHeight;
@@ -41,9 +42,9 @@ public class RobotAnimation {
         neckHeight = 0.12f;
         headRadius = 0.15f;
         headSegments = 10;
-        rightUpperArmWidth = 0.20f;
+        rightUpperArmWidth = 0.30f;
         rightUpperArmHeight = 0.08f;
-        rightForearmWidth = 0.15f;
+        rightForearmWidth = 0.25f;
         rightForearmHeight = 0.06f;
         leftUpperArmWidth = 0.30f;
         leftUpperArmHeight = 0.08f;
@@ -66,9 +67,9 @@ public class RobotAnimation {
                 if (key == GLFW.GLFW_KEY_ESCAPE)
                     GLFW.glfwSetWindowShouldClose(window, true);
                 else if (key == GLFW.GLFW_KEY_RIGHT)
-                    neckTiltAngle--;
+                    armTiltAngle--;
                 else if (key == GLFW.GLFW_KEY_LEFT)
-                    neckTiltAngle++;
+                    armTiltAngle++;
             }
         });
     }
@@ -144,46 +145,49 @@ public class RobotAnimation {
     
     // HOMEWORK: Finish drawing the robot if you can
     private void drawRobot() {
+        GL11.glPushMatrix();
         drawTorso();
         
         GL11.glPushMatrix();
-        GL11.glTranslatef(torsoWidth / 2, 
-                (torsoHeight - rightUpperArmHeight) / 2, 0f);
-        GL11.glRotatef(neckTiltAngle, 0, 0, 1);
-        GL11.glTranslatef(rightUpperArmWidth / 2, 0f, 0f);
+        GL11.glTranslatef(torsoWidth / 2, torsoHeight / 2 - rightUpperArmHeight / 2, 0);
+        GL11.glRotatef(armTiltAngle, 0, 0, 1);
+        GL11.glTranslatef(rightUpperArmWidth / 2, 0, 0);
         drawRightUpperArm();
         GL11.glPushMatrix();
-        GL11.glTranslatef(rightUpperArmWidth / 2, 0f, 0f);
-        GL11.glRotatef(neckTiltAngle, 0, 0, 1);
-        GL11.glTranslatef(rightForearmWidth / 2, 0f, 0f);
+        GL11.glTranslatef(rightUpperArmWidth / 2, 0, 0);
+        GL11.glRotatef(armTiltAngle, 0, 0, 1);
+        GL11.glTranslatef(rightForearmWidth / 2, 0, 0);
         drawRightForearm();
         GL11.glPopMatrix();
         GL11.glPopMatrix();
+
+        GL11.glPushMatrix();
+        GL11.glTranslatef(-torsoWidth / 2, torsoHeight / 2 - leftUpperArmHeight / 2, 0);
+        GL11.glRotatef(armTiltAngle, 0, 0, 1);
+        GL11.glTranslatef(-leftUpperArmWidth / 2, 0, 0);
+        drawLeftUpperArm();
         
         GL11.glPushMatrix();
-        GL11.glTranslatef(-torsoWidth / 2, 
-                (torsoHeight - leftUpperArmHeight) / 2, 0f);
-        GL11.glRotatef(neckTiltAngle, 0, 0, 1);
-        GL11.glTranslatef(-leftUpperArmWidth / 2, 0f, 0f);
-        drawLeftUpperArm();
-        GL11.glPushMatrix();
-        GL11.glTranslatef(-leftUpperArmWidth / 2, 0f, 0f);
-        GL11.glRotatef(neckTiltAngle, 0, 0, 1);
-        GL11.glTranslatef(-leftForearmWidth / 2, 0f, 0f);
+        GL11.glTranslatef(-leftUpperArmWidth / 2, 0, 0);
+        GL11.glRotatef(armTiltAngle, 0, 0, 1);
+        GL11.glTranslatef(-leftForearmWidth / 2, 0, 0);
         drawLeftForearm();
         GL11.glPopMatrix();
         GL11.glPopMatrix();
-        
+
         GL11.glPushMatrix();
         // HOMEWORK: Fix the pivot point, you'll need a translate, rotate and another translate
         // REPLACE THE NUMBERS WITH SOME SYMBOLIC CONSTANTS or VARIABLES
-        GL11.glTranslatef(0, (float) (torsoHeight + neckHeight) / 2, 0);
+        GL11.glTranslatef(0, torsoHeight / 2, 0);
         GL11.glRotatef(neckTiltAngle, 0, 0, 1);
+        GL11.glTranslatef(0, neckHeight / 2, 0);
         drawNeck();
         GL11.glPushMatrix();
         GL11.glTranslatef(0, (float) (headRadius + neckHeight / 2), 0);
         drawHead();
         GL11.glPopMatrix();
+        GL11.glPopMatrix();
+        
         GL11.glPopMatrix();
     }
     
