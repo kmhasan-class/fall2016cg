@@ -19,9 +19,42 @@ public class RobotAnimation {
     private long window;
     private float neckTiltAngle = 0f;
     
+    private float neckWidth;
+    private float neckHeight;
+    private float torsoWidth;
+    private float torsoHeight;
+    private float headRadius;
+    private int headSegments;
+    private float rightUpperArmWidth;
+    private float rightUpperArmHeight;
+    private float rightForearmWidth;
+    private float rightForearmHeight;
+    private float leftUpperArmWidth;
+    private float leftUpperArmHeight;
+    private float leftForearmWidth;
+    private float leftForearmHeight;
+    
+    private void setParameters() {
+        torsoWidth = 0.30f;
+        torsoHeight = 0.40f;
+        neckWidth = 0.10f;
+        neckHeight = 0.12f;
+        headRadius = 0.15f;
+        headSegments = 10;
+        rightUpperArmWidth = 0.20f;
+        rightUpperArmHeight = 0.08f;
+        rightForearmWidth = 0.15f;
+        rightForearmHeight = 0.06f;
+        leftUpperArmWidth = 0.30f;
+        leftUpperArmHeight = 0.08f;
+        leftForearmWidth = 0.25f;
+        leftForearmHeight = 0.06f;
+    }
+    
     private void init() {
         GLFW.glfwInit();
-        window = GLFW.glfwCreateWindow(600, 600, "Analog Clock", 0, 0);
+        setParameters();
+        window = GLFW.glfwCreateWindow(800, 800, "Robot Animation", 0, 0);
         GLFW.glfwMakeContextCurrent(window);
         GL.createCapabilities();
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
@@ -33,9 +66,9 @@ public class RobotAnimation {
                 if (key == GLFW.GLFW_KEY_ESCAPE)
                     GLFW.glfwSetWindowShouldClose(window, true);
                 else if (key == GLFW.GLFW_KEY_RIGHT)
-                    neckTiltAngle++;
-                else if (key == GLFW.GLFW_KEY_LEFT)
                     neckTiltAngle--;
+                else if (key == GLFW.GLFW_KEY_LEFT)
+                    neckTiltAngle++;
             }
         });
     }
@@ -70,29 +103,85 @@ public class RobotAnimation {
     }
 
     private void drawTorso() {
-        drawRectangle(0.25, 0.40);
+        drawRectangle(torsoWidth, torsoHeight);
     }
     
     private void drawNeck() {
-        drawRectangle(0.1, 0.15);
+        drawRectangle(neckWidth, neckHeight);
+    }
+    
+    private void drawRightUpperArm() {
+        drawRectangle(rightUpperArmWidth, rightUpperArmHeight);
+    }
+
+    private void drawRightForearm() {
+        drawRectangle(rightForearmWidth, rightForearmHeight);
+    }
+    
+    private void drawLeftUpperArm() {
+        drawRectangle(leftUpperArmWidth, leftUpperArmHeight);
+    }
+
+    private void drawLeftForearm() {
+        drawRectangle(leftForearmWidth, leftForearmHeight);
     }
     
     private void drawHead() {
         // HOMEWORK: add two eyes and a nose (triangle)
-        drawCircle(0.15, 10);
+        GL11.glPushMatrix();
+        GL11.glBegin(GL11.GL_LINE_LOOP);
+        GL11.glVertex3f(0f, headRadius * 0.1f, 0);
+        GL11.glVertex3f(-headRadius * 0.1f, -headRadius * 0.3f, 0);
+        GL11.glVertex3f(+headRadius * 0.1f, -headRadius * 0.3f, 0);
+        GL11.glEnd();
+        GL11.glTranslatef(headRadius * 0.35f, headRadius * 0.1f, 0f);
+        drawCircle(headRadius * 0.2f, headSegments);
+        GL11.glTranslatef(-headRadius * 0.7f, 0f, 0f);
+        drawCircle(headRadius * 0.2f, headSegments);
+        GL11.glPopMatrix();
+        drawCircle(headRadius, headSegments);
     }
     
     // HOMEWORK: Finish drawing the robot if you can
     private void drawRobot() {
         drawTorso();
+        
+        GL11.glPushMatrix();
+        GL11.glTranslatef(torsoWidth / 2, 
+                (torsoHeight - rightUpperArmHeight) / 2, 0f);
+        GL11.glRotatef(neckTiltAngle, 0, 0, 1);
+        GL11.glTranslatef(rightUpperArmWidth / 2, 0f, 0f);
+        drawRightUpperArm();
+        GL11.glPushMatrix();
+        GL11.glTranslatef(rightUpperArmWidth / 2, 0f, 0f);
+        GL11.glRotatef(neckTiltAngle, 0, 0, 1);
+        GL11.glTranslatef(rightForearmWidth / 2, 0f, 0f);
+        drawRightForearm();
+        GL11.glPopMatrix();
+        GL11.glPopMatrix();
+        
+        GL11.glPushMatrix();
+        GL11.glTranslatef(-torsoWidth / 2, 
+                (torsoHeight - leftUpperArmHeight) / 2, 0f);
+        GL11.glRotatef(neckTiltAngle, 0, 0, 1);
+        GL11.glTranslatef(-leftUpperArmWidth / 2, 0f, 0f);
+        drawLeftUpperArm();
+        GL11.glPushMatrix();
+        GL11.glTranslatef(-leftUpperArmWidth / 2, 0f, 0f);
+        GL11.glRotatef(neckTiltAngle, 0, 0, 1);
+        GL11.glTranslatef(-leftForearmWidth / 2, 0f, 0f);
+        drawLeftForearm();
+        GL11.glPopMatrix();
+        GL11.glPopMatrix();
+        
         GL11.glPushMatrix();
         // HOMEWORK: Fix the pivot point, you'll need a translate, rotate and another translate
         // REPLACE THE NUMBERS WITH SOME SYMBOLIC CONSTANTS or VARIABLES
-        GL11.glTranslatef(0, (float) (0.40 + 0.15) / 2, 0);
+        GL11.glTranslatef(0, (float) (torsoHeight + neckHeight) / 2, 0);
         GL11.glRotatef(neckTiltAngle, 0, 0, 1);
         drawNeck();
         GL11.glPushMatrix();
-        GL11.glTranslatef(0, (float) (0.15 + 0.15 / 2), 0);
+        GL11.glTranslatef(0, (float) (headRadius + neckHeight / 2), 0);
         drawHead();
         GL11.glPopMatrix();
         GL11.glPopMatrix();
